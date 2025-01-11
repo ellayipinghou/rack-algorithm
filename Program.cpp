@@ -27,7 +27,7 @@ void Program::read_data() {
     ifstream infile;
     infile.open(filename);
     if (infile.fail()) {
-        cout << "Error opening file. Check that file name is valid and that the file is located in the inner project folder" << endl;
+        cout << "Error opening file. Check that file name is valid and that the file is located in the same folder as the project (RackFinal.vcxproj)" << endl;
         exit(EXIT_FAILURE);
     }
     while (!infile.eof()) {
@@ -50,25 +50,6 @@ void Program::populate_frequencies() {
     for (int i = 0; i < all_sources.size(); i++) {
         sample_frequencies[all_sources.at(i).num_samples]++;
     }
-}
-
-/*
-* name: find_largest
-* purpose: returns the largest undistributed sample number based on sample_frequencies
-* arguments: none
-* returns: the largest remaining sample number
-* notes: none
-*/
-int Program::find_largest() {
-    for (int i = rack_capacity; i > 0; i--) {
-        //starting from the highest number, return the first sample num with non-zero frequency
-        if (sample_frequencies[i] != 0) {
-            return i;
-        }
-    }
-    //if all are 0, all source racks have been used
-    cerr << "error, see line 64" << endl;
-    exit(EXIT_FAILURE);
 }
 
 /*
@@ -102,10 +83,15 @@ void Program::distribute_remainder() {
         testing_array.clear();
 
         int sum = 0;
+        int num_destinations = 0;
         for (int i = 0; i < all_sources.size(); i++) {
+            
             sum += all_sources.at(i).num_samples;
             //i is the number of sources currently, so check if the sum surpasses the number of spots in the destination racks
-            if (sum > (20 - i) * 96) {
+            if (sum > (num_destinations * SOURCE_SPOTS)) {
+                num_destinations++;
+            }
+            if (testing_array.size() + 1 + num_destinations > 20) {
                 break;
             }
             testing_array.push_back(all_sources.at(i).num_samples);
@@ -128,11 +114,10 @@ int Program::choose_num_sources() {
 
     //start with the smallest number of sources
     int num_sources = 1;
-    int destination_spots = (20 - num_sources) * 96;
+    int destination_spots = (20 - num_sources) * SOURCE_SPOTS;
 
     //add the largest value
-    int largest = find_largest();
-    add_in_order(testing_array, largest);
+    add_in_order(testing_array, find_next_highest_valid(SOURCE_SPOTS + 1));
 
     //find the most sources we can add to the highest value without the sample total exceeding the number of destination spots
     while (total_testing_samples() <= destination_spots && num_sources < 20) {
@@ -140,10 +125,10 @@ int Program::choose_num_sources() {
         add_in_order(testing_array, find_smallest());
         //update number of sources and destination spots
         num_sources++;
-        destination_spots = (20 - num_sources) * 96;
+        destination_spots = (20 - num_sources) * SOURCE_SPOTS;
     }
     //remove all values from testing array to reset for when the values are actually added
-    int num_to_remove = testing_array.size();
+    size_t num_to_remove = testing_array.size();
     for (int i = 0; i < num_to_remove; i++) {
         remove_from_testing(testing_array.at(0));
     }
@@ -178,24 +163,23 @@ void Program::create_new_batch(int num_source_racks) {
 
     //add all values except one and find the ideal last spot
     add_all_except_last(num_source_racks);
-    fill_valid_sample_nums();
+
     int ideal_last_spot = ideal_last(num_source_racks);
 
-    //decrease the total if necessary
+    //if total is too high, decrease total until you get to the next best last spot
     int to_add;
-    decrease_testing_total(ideal_last_spot, to_add, num_source_racks);
-
-    //increase total if necessary
-    bool approximate = false;
-    increase_testing_total(ideal_last_spot, to_add, num_source_racks, approximate);
-
-    //if we've replaced the smallest in the array with the largest and the destination spots are still not fully filled, just add the largest available
-    if (approximate) {
-        add_in_order(testing_array, find_largest());
+    if (ideal_last_spot < 1) {
+        decrease_testing_total(ideal_last_spot, to_add, num_source_racks);
+        while (not (is_valid(ideal_last_spot))) {
+            ideal_last_spot = find_next_highest_valid(ideal_last_spot);
+        }
+    } // if total is too low, increase total until you get to the next best last spot
+    else if (ideal_last_spot > 96 || not is_valid(ideal_last_spot)) {
+        increase_testing_total(ideal_last_spot, to_add, num_source_racks);
     }
-    else {
-        add_in_order(testing_array, ideal_last_spot);
-    }
+    // add final value to testing array
+    add_in_order(testing_array, ideal_last_spot);
+    
     //create the batch, add sources with corresponding sample numbers to it, and push the batch to the end of the finished_batches vector
     finished_batches.push_back(finalize_spots());
 }
@@ -212,10 +196,8 @@ void Program::create_new_batch(int num_source_racks) {
 void Program::decrease_testing_total(int& ideal_last_spot, int &to_add, int &num_source_racks) {
     //decrease only necessary if sum is higher than the number of available spots
     while (ideal_last_spot < 1) {
-
         //find the second largest value, which we will remove
         int second_largest = testing_array.at(testing_array.size() - 2);
-
         //decrement to find the next highest valid value, which we will add
         to_add = find_next_highest_valid(second_largest);
 
@@ -223,8 +205,7 @@ void Program::decrease_testing_total(int& ideal_last_spot, int &to_add, int &num
         remove_from_testing(second_largest);
         add_in_order(testing_array, to_add);
 
-        //update to_add and ideal_last_spot for the next loop
-        to_add = find_next_highest_valid(to_add);
+        //update ideal_last_spot for the next loop
         ideal_last_spot = ideal_last(num_source_racks);
     }
 }
@@ -234,80 +215,71 @@ void Program::decrease_testing_total(int& ideal_last_spot, int &to_add, int &num
 * purpose: returns the next highest valid number based on the valid_sample_nums vector
 * arguments: an int (current) for the value to start decrementing at
 * returns: the next highest valid sample number
-* notes: approximate is not needed here because this is just to get the total sample numbers to be less than the goal if necessary, afterwards we start
-*        increasing the total again and approximate will be called by find_next_smallest_valid if needed
+* notes: none
 */
-int Program::find_next_highest_valid(int& current) {
-    if (current == valid_sample_nums.at(1)) {
-        //Note: it should never be the case that even adding all the smallest values to the largest value will be greater than the total,
-        //since we've validated it with choose_num_sources
-        return valid_sample_nums.at(0);
-    }
-    for (int i = valid_sample_nums.size() - 1; i > 0; i--) {
-        if (current == valid_sample_nums.at(i)) {
-            return valid_sample_nums.at(i - 1);
+int Program::find_next_highest_valid(int current) {
+    for (int i = current - 1; i > 0; i--) {
+        if (sample_frequencies[i] > 0) {
+            return i;
         }
     }
+
     //if made it to the end, then current doesn't exist in the valid sample numbers array
-    cerr << "error: current does not exist in the valid sample nums or it is the smallest value already";
+    cerr << "error: no more next highest values";
     exit(EXIT_FAILURE);
 }
 
 /*
 * name: increase_testing_total
 * purpose: increase sum of the samples in the testing array by replacing the lower values with higher values until the goal is reached or the highest remaining value is reached
-* arguments: int references to the ideal last spot, the value to replace with, and the number of source racks in the current batch, bool reference that determines
-*            whether or not the program should just approximate the total
-* returns: none
+* arguments: int references to the ideal last spot, the value to replace with, and the number of source racks in the current batch
+* returns: an int that represents the largest value
 * notes: none
 */
-void Program::increase_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks, bool& approximate) {
-    //increase until the ideal last spot is available or until the we've reached the largest possible value
-    while (ideal_last_spot < 96 && !is_valid(ideal_last_spot)) {
+void Program::increase_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks) {
+    // start by removing the smallest value in the testing array
+    int to_remove = testing_array.at(0);
 
-        //find the smallest value, which we will remove
-        int smallest_in_testing = valid_sample_nums.at(0);
+    //continue increase total process until the ideal last spot is available or until the we've reached the largest possible value
+    while (ideal_last_spot < SOURCE_SPOTS && !is_valid(ideal_last_spot)) {
+        //increment to find the next smallest value (the value just higher than to_remove), which we will add
+        to_add = find_next_smallest_valid(to_remove);
 
-        //increment to find the next smallest value, which we will add
-        to_add = find_next_smallest_valid(smallest_in_testing, approximate);
-
-        //if we've reached the highest possible value, return - we will just add the highest available value instead
-        if (approximate) {
+        // if to_remove is the largest valid already, just use that value to add to the testing array, will be an approximate
+        if (to_add == find_next_highest_valid(SOURCE_SPOTS + 1)) {
+            ideal_last_spot = to_add;
             return;
         }
 
-        //remove the smallest and add the larger number, updating sample_frequencies and valid_sample_nums
-        remove_from_testing(smallest_in_testing);
+        // otherwise, finalize by removal and addition, updating sample_frequencies and valid_sample_nums
+        remove_from_testing(to_remove);
         add_in_order(testing_array, to_add);
-        valid_sample_nums.erase(valid_sample_nums.begin());
-
-        //update the ideal last spot for next loop
         ideal_last_spot = ideal_last(num_source_racks);
+
+        //update the next smallest value in the testing array
+        int i = 0;
+        while (i < testing_array.size() - 1 && testing_array.at(i) <= to_remove) {
+            i++;
+        }
+        to_remove = testing_array.at(i);
     }
 }
 
 /*
 * name: find_next_smallest_valid
 * purpose: returns the next smallest valid number based on the valid_sample_nums vector
-* arguments: an int (current) for the value to start incrementing at and a bool that represents whether current is already the largest valid number and can no longer be incremented
+* arguments: an int (current) for the value to start incrementing at
 * returns: the next smallest valid number
-* notes: setting approximate to be true indicates that the program should add the largest valid number left, even it it doesn't make
-         the sample total reach the desired total
+* notes: none
 */
-int Program::find_next_smallest_valid(int& current, bool& approximate) {
-    if (valid_sample_nums.size() == 1) {
-        approximate = true;
-        return -1;
-    }
-    //return the next value in the valid_sample_nums array
-    for (int i = 0; i < valid_sample_nums.size() - 1; i++) {
-        if (current == valid_sample_nums.at(i)) {
-            return valid_sample_nums.at(i + 1);
+int Program::find_next_smallest_valid(int current) {
+    for (int i = current + 1; i < SOURCE_SPOTS + 1; i++) {
+        if (sample_frequencies[i] > 0) {
+            return i;
         }
     }
-    //if made it to the end, then current doesn't exist in the valid sample numbers array
-    cerr << "error: current isn't in valid list when adding next smallest" << endl;
-    exit(EXIT_FAILURE);
+    // otherwise, current is the largest already - can't get a next smallest
+    return current;
 }
 
 /*
@@ -331,6 +303,7 @@ void Program::export_results() {
     outfile.open(output_name);
     if (outfile.fail()) {
         cout << "Error creating file. Please check that the inputted file name is valid and re-run program" << endl;
+        exit(EXIT_FAILURE);
     }
 
     //create output string and add information
@@ -362,8 +335,8 @@ void Program::export_results() {
     }
 
     outfile << output << endl;
-    cout << endl << "Your text file has been created with the name " << output_name << endl;
-    cout << "Output file should be located in same folder as input file" << endl;
+    cout << endl << "Your text file has been created with the name: " << output_name << endl;
+    cout << "Output file should be located in same folder as project (RackFinal.vcxproj)" << endl;
 
     outfile.close();
 }
@@ -391,8 +364,8 @@ void Program::print_summary() {
                 total_spots_filled += finished_batches.at(i).batch_sources.at(k).num_samples;
             }
 
-            int num_destinations = total_spots_filled / 96;
-            if (total_spots_filled % 96 != 0) {
+            int num_destinations = total_spots_filled / SOURCE_SPOTS;
+            if (total_spots_filled % SOURCE_SPOTS != 0) {
                 num_destinations++;
             }
             cout << "Number of destinations in this batch: " << num_destinations << endl;
@@ -402,27 +375,10 @@ void Program::print_summary() {
     }
 }
 
-/*
-* name: fill_valid_sample_nums
-* purpose: fills the valid_sample_nums vector with all sample numbers where the frequency is greater than 0 (meaning it is available to add to a batch)
-* arguments: none
-* returns: none
-* notes: this function makes it easier to get the next largest or smallest sample number rather than directly using the sample_frequencies
-*        array and having to keep incrementing or decrementing until the frequency is not 0
-*/
-void Program::fill_valid_sample_nums() {
-    //reset vector
-    valid_sample_nums.clear();
-    for (auto it : sample_frequencies) {
-        if (it.second > 0) {
-            add_in_order(valid_sample_nums, it.first);
-        }
-    }
-}
 
 /*
 * name: print_frequencies
-* purpose: prints each key-value pair in the sample_frequencies, which is constantly updated as sample numbers are
+* purpose: prints each sample value and its frequency, which are constantly updated as sample numbers are
            removed and added to testing array
 * arguments: none
 * returns: none
@@ -430,8 +386,8 @@ void Program::fill_valid_sample_nums() {
 */
 void Program::print_frequencies() {
     cout << endl;
-    for (auto it : sample_frequencies) {
-        cout << it.first << ": " << it.second << endl;
+    for (int i = 1; i < sample_frequencies.size(); i++) {
+        cout << i << ": " << sample_frequencies[i] << endl;
     }
 }
 
@@ -446,21 +402,6 @@ void Program::print_sources() {
     for (int i = 0; i < all_sources.size(); i++) {
         cout << all_sources.at(i).id << " " << all_sources.at(i).num_samples << endl;
     }
-}
-
-/*
-* name: print_sources
-* purpose: prints a list of all the valid (available) sample numbers
-* arguments: none
-* returns: none
-* notes: only used for testing purposes
-*/
-void Program::print_valid_sample_nums() {
-    cout << "printing valid sample numbers: ";
-    for (int i = 0; i < valid_sample_nums.size(); i++) {
-        cout << valid_sample_nums.at(i) << " ";
-    }
-    cout << endl;
 }
 
 /*
@@ -501,7 +442,7 @@ Program::Source_Rack Program::find_source(int sample_num) {
         }
     }
     //if not found, something went wrong
-    cerr << "source " << sample_num << "not found when finalizing spots, exiting now";
+    cerr << "source " << sample_num << " not found when finalizing spots, exiting now";
     exit(EXIT_FAILURE);
 }
 
@@ -514,7 +455,8 @@ Program::Source_Rack Program::find_source(int sample_num) {
 */
 void Program::add_all_except_last(int num_source_racks) {
     //add largest value
-    add_in_order(testing_array, find_largest());
+    int largest = SOURCE_SPOTS + 1;
+    add_in_order(testing_array, find_next_highest_valid(largest));
 
     //add frequencies based on ratios
     add_ratios(num_source_racks);
@@ -522,7 +464,7 @@ void Program::add_all_except_last(int num_source_racks) {
     //add extra of the smallest value to add until there is only 1 spot left
     while (testing_array.size() < num_source_racks - 1) {
         if (find_smallest() == -1) {
-            cerr << "no more source racks to distribute, returning now" << endl;
+            cerr << "error: no more source racks to distribute, returning now" << endl;
             return;
         }
         else {
@@ -594,6 +536,10 @@ void Program::add_ratios(int num_source_racks) {
             int amount_to_add = (sample_frequencies[i] * num_source_racks) / all_sources.size();
             //add that amount of the sample number to the vector as long as there are enough
             while (amount_to_add > 0 && sample_frequencies[i] > 0) {
+                // make sure there's a last spot available
+                if (testing_array.size() == num_source_racks - 1) {
+                    return;
+                }
                 add_in_order(testing_array, i);
                 amount_to_add--;
             }
