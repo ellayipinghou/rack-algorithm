@@ -17,12 +17,18 @@ sample_frequencies hash map and a testing vector to guide Batch creation.
 #include <unordered_map>
 
 using namespace std;
+const int SOURCE_SPOTS = 96;
 
 class Program {
 public:
 	//constructor
 	Program(int rack_capacity) {
 		this->rack_capacity = rack_capacity;
+
+		//initialize sample_frequencies array
+		for (int i = 0; i < SOURCE_SPOTS + 1; i++) {
+			sample_frequencies.push_back(0);
+		}
 	}
 	
 	//read and analyze data about the rack sample numbers
@@ -62,11 +68,9 @@ private:
 	//all currently finished batches in the program
 	vector<Batch> finished_batches;
 
-	//hash map to store frequencies of each sample number (key is sample number, value is frequency)
-	unordered_map<int, int> sample_frequencies;
+	//vector to store frequencies of each sample number, with the index matching up with the sample number (index 0 is unused)
+	vector<int> sample_frequencies;
 
-	//hash map to store only the non-zero sample numbers
-	vector<int> valid_sample_nums;
 
 	//higher-level methods for creating batches
 	void create_new_batch(int num_source_spots);
@@ -78,24 +82,22 @@ private:
 	void distribute_remainder();
 
 	//lower-level helper methods for creating batches
-	void fill_valid_sample_nums();
+	//void fill_valid_sample_nums();
 	bool is_valid(int num);
-	int find_largest();
 	int find_smallest();
 	int ideal_last(int num_source_spots);
 	int total_testing_samples();
 	void decrease_testing_total(int &ideal_last_spot, int &to_add, int &num_source_racks);
-	void increase_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks, bool &approximate);
+	void increase_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks);
 	void add_in_order(vector<int>& which_vector, int to_add);
 	void remove_from_testing(int to_remove);
-	int find_next_smallest_valid(int& current, bool& approximate);
-	int find_next_highest_valid(int& current);
+	int find_next_smallest_valid(int current);
+	int find_next_highest_valid(int current);
 
 	//print methods for testing purposes
 	void print_frequencies();
 	void print_sources();
 	void print_testing_array();
-	void print_valid_sample_nums();
 };
 
 #endif
