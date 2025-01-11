@@ -5,7 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <array>
-#include "C:\Users\Yonghui\source\repos\Rack_Final\Program.h"
+#include "..\Program.h"
 
 using namespace std;
 const int SOURCE_SPOTS = 96;
