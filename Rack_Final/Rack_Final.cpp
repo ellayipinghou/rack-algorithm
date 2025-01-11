@@ -1,4 +1,4 @@
-//Rack_File.cpp: main driver file for the rack algorithm. Reads in data, initializes an
+//Rack_Final.cpp: main driver file for the rack algorithm. Reads in data, initializes an
 //instance of the Program class, executes the algorithm, and displays results
 
 #include <iostream>
