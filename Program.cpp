@@ -344,7 +344,7 @@ void Program::export_results() {
     }
 
     //create output string and add information
-    string output = "Rack ID,Sample Number,Batch Number,Number of Samples In Batch\n";
+    string output = "Rack ID,Sample Number,Batch Number,Number Destinations,Total Samples In Batch\n";
 
     for (int i = 0; i < finished_batches.size(); i++) {
         for (int j = 0; j < finished_batches.at(i).batch_sources.size(); j++) {
@@ -358,6 +358,10 @@ void Program::export_results() {
 
             //add batch number to output
             output += to_string(i + 1);
+            output += ",";
+
+            //add number of destination racks
+            output += to_string(20 - finished_batches.at(i).batch_sources.size());
             output += ",";
 
             //add number of samples in batch
