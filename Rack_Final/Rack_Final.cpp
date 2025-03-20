@@ -8,10 +8,9 @@
 #include "..\Program.h"
 
 using namespace std;
-const int SOURCE_SPOTS = 96;
 
 int main() {
-	Program my_program(SOURCE_SPOTS);
+	Program my_program;
 
 	//read and initialize
 	my_program.read_data();
