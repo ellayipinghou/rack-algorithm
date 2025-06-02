@@ -379,13 +379,8 @@ void Program::export_results() {
     }
 
     outfile << output << endl;
-<<<<<<< HEAD
     cout << endl << "Your text file has been created with the name: " << filename << endl;
     cout << "Output file should be located in folder named 'results', located within the same folder as RackFinal.vcxproj" << endl;
-=======
-    cout << endl << "Your text file has been created with the name: " << output_name << endl;
-    cout << "Output file should be located in same folder as project (RackFinal.vcxproj)" << endl;
->>>>>>> 940051b5802f21a7ba4e55f727e78bcbfd06b99d
 
     outfile.close();
 }
