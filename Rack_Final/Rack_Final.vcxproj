@@ -127,11 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Program.cpp" />
+    <ClCompile Include="../Program.cpp" />
     <ClCompile Include="Rack_Final.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Program.h" />
+    <ClInclude Include="../Program.h" />
+    <ClInclude Include="Individual.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\rack_data.txt" />

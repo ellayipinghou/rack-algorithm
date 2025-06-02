@@ -1,17 +1,16 @@
-//Rack_File.cpp: main driver file for the rack algorithm. Reads in data, initializes an
+//Rack_Final.cpp: main driver file for the rack algorithm. Reads in data, initializes an
 //instance of the Program class, executes the algorithm, and displays results
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <array>
-#include "C:\Users\Yonghui\source\repos\Rack_Final\Program.h"
+#include "..\Program.h"
 
 using namespace std;
-const int SOURCE_SPOTS = 96;
 
 int main() {
-	Program my_program(SOURCE_SPOTS);
+	Program my_program;
 
 	//read and initialize
 	my_program.read_data();
