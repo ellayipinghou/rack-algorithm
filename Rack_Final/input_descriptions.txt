@@ -1,0 +1,59 @@
+The various test inputs vary in the number of racks and their distribution. Note that the "typical skew" in this real-life scenario according to the lab scientists is a heavy skew towards lower-numbered samples.
+
+rack_1_input.txt: 
+- number of racks: 777
+- distribution: heavy skew towards lower-numbered samples (most frequent = 1-2)
+- order: racks are initially ordered by number of samples, descending
+
+rack_2_input.txt: 
+- number of racks: 77
+- distribution: heavy skew towards lower-numbered samples (most frequent = 4-6)
+- order: racks are initially ordered by number of samples, ascending
+
+rack_3_input.txt:
+- number of racks: 400
+- distribution: heavy skew towards lower-numbered samples
+- order: none
+
+rack_4_input.txt:
+- number of racks: 400
+- distribution: mid-range heavy (clustered around 40-70)
+- order: none
+
+rack_5_input.txt:
+- number of racks: 400
+- distribution: relatively uniform (from 1-95)
+- order: none
+
+rack_6_input.txt:
+- number of racks: 400
+- distribution: inverted skew, favoring higher-numbered samples
+- order: none
+
+rack_7_input.txt:
+- number of racks: 21
+- distribution: multi-modal, with peaks art 17, 23, and 93
+- order: none
+
+rack_8_input.txt:
+- number of racks: 17
+- distribution: relatively uniform (from 1-96)
+- order: none
+- note: this tests the edge case of an source rack having 96 samples, which is allowed but unlikely
+
+rack_9_input.txt:
+- number of racks: 8
+- distribution: uniform from 1 to 8 (1 rack with each sample number)
+- order: none
+- note: this tests the edge case that all source racks fit into 1 destination rack
+
+rack_10_input.txt:
+- number of racks: 1021
+- distribution: moderate skew towards lower-numbered samples (most frequent = 2-5)
+- order: semi-ordered by number of samples, ascending
+
+rack_11_input.txt:
+- number of racks: 629
+- distribution: all 95's
+- order: none
+- note: this is an edge case

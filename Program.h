@@ -45,6 +45,8 @@ public:
 private:
 	//temporary vector finding the best combination of sample numbers before modifying actual all_sources array, cleared with each new batch
 	vector<int> testing_array;
+	// vector that holds the testing array found during choose_num_sources, a backup if strategy doesn't work
+	vector<int> backup_array;
 
 	//definition for Source_Rack
 	struct Source_Rack {
@@ -70,9 +72,9 @@ private:
 
 
 	//higher-level methods for creating batches
-	void create_new_batch(int num_source_spots, vector<int> example_testing_array);
-	int choose_num_sources(vector<int>& example_testing_array);
-	void add_all_except_last(int num_source_spots);
+	void create_new_batch(int num_source_spots);
+	int choose_num_sources();
+	bool add_all_except_last(int num_source_spots);
 	void add_ratios(int num_source_spots);
 	Batch finalize_spots();
 	Source_Rack find_source(int sample_num);
@@ -84,8 +86,8 @@ private:
 	int find_smallest();
 	int ideal_last(int num_source_spots);
 	int total_testing_samples();
-	void decrease_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks);
-	void increase_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks, vector<int> example_testing_array, bool &approximate);
+	bool decrease_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks);
+	void increase_testing_total(int& ideal_last_spot, int& to_add, int& num_source_racks, bool &approximate);
 	void add_in_order(vector<int>& which_vector, int to_add);
 	void remove_from_testing(int to_remove);
 	int find_next_smallest_valid(int current);
