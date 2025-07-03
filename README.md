@@ -13,17 +13,61 @@ In summer of 2024, a researcher at a local hospital expressed to me their frustr
 
 This means that for a batch with x source racks, there are 20 - x destination racks, and a total sample capacity of (20 - x) * 96.
 
-## How the Algorithm Works 🔎
+## Details: How the Algorithm Works 🔎
 
-The algorithm starts by reading the rack data and populating the sample_frequencies vector based on the number of racks with each sample number. The program also creates a testing_array vector, which is used to temporarily store and manipulate sample numbers during the process of finding an optimal solution. As sample numbers are added to or removed from the testing_array, the sample_frequencies vector is updated accordingly to reflect these changes. Based on the number of source racks available, the algorithm chooses whether to create another batch using create_new_batch() or distribute_remainder(). 
+### Data Initialization
+The algorithm begins by reading rack data and populating a sample_frequencies array that tracks how many racks contain each sample number (1-95). A testing_array vector is used to temporarily store and manipulate sample numbers while finding optimal batch combinations. As sample numbers are added to or removed from the testing array, the frequencies are updated in real-time to reflect availability.
 
-In create_new_batch(), the program first determines the maximum number of sources that can be used for the current batch so that the total number of sample values doesn't exceed the available spots in the destination racks. The program also saves calculated testing array, consisting of the largest value and (num_sources - 1) of the smallest values, for later approximation purposes. After choosing the number of sources, the program clears the testing array and adds in order: 1) the largest available number, 2) the proportional number of each sample number based on their frequencies (to create a more balanced distribution), and 3) the lowest values available, until there is only 1 source spot available.
+### Main Distribution Loop
+The program distributes all source racks using two main strategies:
 
-The program then calculates the ideal last sample number and checks its availability using the sample_frequencies map. If the ideal last spot is less than 1, the program decreases the total sample number in the testing array by removing a larger number and adding a smaller one, repeating this process until the last spot is greater than 1 and available. If the last spot is greater than 1, the program increases the total sample number in the testing array by removing the smallest sample number and adding a larger one, continuing this until the last spot becomes available or the number to add reaches the highest sample number available. If it reaches the highest sample number and the total in the testing array still doesn’t meet the goal, the program approximates by adding the largest sample number available. If ideal_last_spot becomes negative at any point in increase_testing_total, it instead uses the example testing array provided by choose_num_sources. It then adds the number it found to the testing array, after which it finalizes the batch by adding all the values in the testing array to the current batch object.  
+#### For Large Batches (≥19 source racks remaining):
+- Uses create_new_batch() to optimize each batch individually
+- Continues until fewer than 19 source racks remain
 
-The program continues onto the next batch using create_new_batch() until the number of source racks left is fewer than 19. Then, the program distributes the remaining source racks by adding as many racks as possible to a batch without exceeding the available destination spots based on the number of source racks. When the limit is reached, a new batch is created, and this process continues until all Source Racks have been distributed.
+#### For Remaining Racks (<19 source racks):
+- Uses distribute_remainder() to efficiently pack remaining racks
+- Creates batches by adding as many racks as possible without exceeding destination capacity
+- Continues until all racks are distributed
 
-After distributing all the racks, the program asks the user if they would like an overview. The overview describes the number of batches, the count of source and destination racks in each batch, and the number of filled spots in the destination racks for each batch. Finally, it exports the final results to a .csv file, detailing the rack IDs and sample number of each source rack in each batch, along with the total number of spots filled in each batch.
+### Batch Creation Process (create_new_batch)
+#### 1. Determine Batch Size
+- choose_num_sources() finds the maximum number of source racks that can fit in one batch
+- Starts with the largest available sample number plus smallest values
+- Incrementally adds sources until destination capacity would be exceeded
+- Saves a backup_array as the last valid configuration before exceeding capacity
+
+#### 2. Build Optimal Combination
+- Clears the testing array and rebuilds it strategically:
+    - Adds the largest available sample number first
+    - Fills remaining spots proportionally based on sample frequencies (for balanced distribution)
+    - Fills any remaining spots with the smallest available values
+    - Leaves exactly one spot open for the "ideal last sample"
+
+#### 3. Calculate and Adjust Final Sample
+- Calculates the ideal_last_spot by subtracting current total from destination capacity
+- If ideal value is too small (<1): Decreases total by replacing larger values with smaller ones
+- If ideal value is too large (>95) or unavailable: Increases total by replacing smaller values with larger ones
+- Fallback mechanism: If adjustments fail, uses the pre-calculated backup_array
+
+#### 4. Finalize Batch
+- Adds the final calculated sample number to complete the batch
+- Creates a new Batch object and assigns actual source racks based on testing array values
+- Removes used racks from the available pool
+
+### Remainder Distribution (distribute_remainder)
+For the final racks, the algorithm uses a simpler greedy approach:
+- Calculates how many racks can fit in the current batch based on sample totals
+- Ensures total sources + destinations doesn't exceed 20 racks per batch
+- Creates new batches as needed until all racks are distributed
+
+### Output and Results
+After distribution is complete, the program:
+- Provides an optional summary showing batch counts, source/destination ratios, and capacity utilization
+- Exports detailed results to a CSV file with columns: Rack ID, Sample Number, Batch Number, Number Sources, Number Destinations, and Total Samples In Batch (with one row per source rack)
+
+## Test Files 📂
+The program includes 11 comprehensive test cases to validate the algorithm's performance across various data distributions. These test files, as well as a text file describing each input in more deatil (input_descriptions.txt) can be found in the same folder as "Rack_Final.vcxproj".
 
 ## Notes about compiling and running 💻
 Ensure that Visual Studio is installed with the "Desktop development with C++" workload. Build the program and run with "debug".
