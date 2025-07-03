@@ -70,7 +70,6 @@ private:
 	//vector to store frequencies of each sample number, with the index matching up with the sample number (index 0 is unused)
 	vector<int> sample_frequencies;
 
-
 	//higher-level methods for creating batches
 	void create_new_batch(int num_source_spots);
 	int choose_num_sources();
@@ -81,7 +80,6 @@ private:
 	void distribute_remainder();
 
 	//lower-level helper methods for creating batches
-	//void fill_valid_sample_nums();
 	bool is_valid(int num);
 	int find_smallest();
 	int ideal_last(int num_source_spots);
