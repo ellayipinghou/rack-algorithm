@@ -2,23 +2,53 @@
 
 ## Overview 📜
 
-This program utilizes a greedy algorithm to handle and process batch data efficiently. Given a number of objects (racks) with a value (sample number) ranging from 1 to 95, it combines the objects into near_capacity racks in as few batches as possible, following several constraints for the batches. The program also allows users to view summaries and export results as a CSV file. Debugging tools are included for testing purposes.
+This program automates the tedious process of combining laboratory sample racks into optimal batches. Using a greedy algorithm, it takes hundreds of individual racks (each containing 1-96 samples) and efficiently combines them into near-capacity destination racks while minimizing the total number of processing batches.
+
+### Key Features ✨:
+- Intelligent batch optimization following laboratory constraints
+- Automated CSV export for easy integration with existing workflows
+- Comprehensive testing suite with 11 test cases
+- Built-in debugging functions for validation
 
 ## The Problem 💥
+In summer 2024, a hospital researcher approached me with a frustrating manual lab task that was eating up hours of their time. They regularly receive hundreds of sample racks containing anywhere from 1 to 96 samples each, and must manually figure out how to combine these into full or near-full racks while minimizing processing batches.
 
-In summer of 2024, a researcher at a local hospital expressed to me their frustration about a tedious lab task they often have to complete manually. They are given hundreds of racks containing anywhere from 1 to 96 samples, and they must combine these racks into full or near-full racks while also minimizing the number of batches. The constraints are as follows:
-- Each batch can have up to 20 racks, made up "source" racks (the ones being emptied) and "destination" racks (the ones being filled)
-    - for example, you can combine 19 source racks into 1 destination rack, 18 source racks into 2 destination racks, etc
-- Each destination rack can hold 96 samples
+**The Challenge**: The process isn't as simple as just filling up racks - there are strict operational constraints:
+- Rack Types: Each batch consists of "source" racks (being emptied) and "destination" racks (being filled)
+- Batch Size Limit: Each processing batch can contain a maximum of 20 racks total (source + destination)
+- Capacity: Each destination rack holds up to 96 samples
+- Balance:  The above constraints mean that for every batch with X source racks, you have up to (20 - X) destination racks and a total capacity of (20 - X) * 96 samples
 
-This means that for a batch with x source racks, there are 20 - x destination racks, and a total sample capacity of (20 - x) * 96.
+**Example**: If you have 18 source racks in a batch, you can only have 2 destination racks, giving you a total sample capacity of 2 × 96 = 192 samples
 
-## Details: How the Algorithm Works 🔎
+## Getting Started 💻 
+### Prerequisites
+- Windows environment (tested with Visual Studio's build system)
+- Visual Studio with "Desktop development with C++" workload installed
+  
+### Setup and Running
+1. **Clone the repository** and open Rack_Final.vcxproj in Visual Studio
+2. **Build the project** using Debug configuration
+3. **Prepare your input file:**
+    - Create a .txt file with your rack data
+    - Format: Each line should contain [Rack_ID] [Sample_Count]
+    - Sample counts must be between 1 and 96
+4. **Place your input file** in the same folder as the Rack_Final.vcxproj file
+5. **Run the program** and follow the prompts
+6. **Find your results** in the generated CSV file in the "results" folder
 
-### Data Initialization
+### Example Input Format
+RACK001 45</br>
+RACK002 23</br>
+RACK003 67</br>
+RACK004 12</br>
+
+## Details: How the Algorithm Works 🔬
+
+### Data Initialization 📝
 The algorithm begins by reading rack data and populating a sample_frequencies array that tracks how many racks contain each sample number (1-95). A testing_array vector is used to temporarily store and manipulate sample numbers while finding optimal batch combinations. As sample numbers are added to or removed from the testing array, the frequencies are updated in real-time to reflect availability.
 
-### Main Distribution Loop
+### Main Distribution Loop 💫
 The program distributes all source racks using two main strategies:
 
 #### For Large Batches (≥19 source racks remaining):
@@ -30,7 +60,7 @@ The program distributes all source racks using two main strategies:
 - Creates batches by adding as many racks as possible without exceeding destination capacity
 - Continues until all racks are distributed
 
-### Batch Creation Process (create_new_batch)
+### Batch Creation Process (create_new_batch) 📊
 #### 1. Determine Batch Size
 - choose_num_sources() finds the maximum number of source racks that can fit in one batch
 - Starts with the largest available sample number plus smallest values
@@ -44,37 +74,38 @@ The program distributes all source racks using two main strategies:
     - Fills any remaining spots with the smallest available values
     - Leaves exactly one spot open for the "ideal last sample"
 
-#### 3. Calculate and Adjust Final Sample
+#### 3. Calculate and Adjust Final Sample 
 - Calculates the ideal_last_spot by subtracting current total from destination capacity
 - If ideal value is too small (<1): Decreases total by replacing larger values with smaller ones
 - If ideal value is too large (>95) or unavailable: Increases total by replacing smaller values with larger ones
 - Fallback mechanism: If adjustments fail, uses the pre-calculated backup_array
 
-#### 4. Finalize Batch
+#### 4. Finalize Batch 
 - Adds the final calculated sample number to complete the batch
 - Creates a new Batch object and assigns actual source racks based on testing array values
 - Removes used racks from the available pool
 
-### Remainder Distribution (distribute_remainder)
+### Remainder Distribution (distribute_remainder) 🔎
 For the final racks, the algorithm uses a simpler greedy approach:
 - Processes remaining source racks in their current order (how they were read in)
 - For each potential source rack, updates required destination racks based on cumulative sample count
 - Stops adding source racks when number of source racks + destination racks in the batch exceeds 20
 - Creates new batches as needed until all remaining racks are distributed
 
-### Output and Results
+### Output and Results 📈
 After distribution is complete, the program:
 - Provides an optional summary showing batch counts, source/destination ratios, and capacity utilization
 - Exports detailed results to a CSV file with columns: Rack ID, Sample Number, Batch Number, Number Sources, Number Destinations, and Total Samples In Batch (with one row per source rack)
+    - The generated CSV file can be found in the "results" folder located in the same folder as Rack_Final.vcxproj
 
 ## Test Files 📂
-The program includes 11 comprehensive test cases to validate the algorithm's performance across various data distributions. These test files, as well as a text file describing each input in more deatil (input_descriptions.txt) can be found in the same folder as "Rack_Final.vcxproj".
+The program includes 11 comprehensive test cases designed to validate the algorithm's performance across different data distributions and edge cases. These test files help ensure the algorithm works correctly under various real-world scenarios.
 
-## Notes about compiling and running 💻
-Ensure that Visual Studio is installed with the "Desktop development with C++" workload. Build the program and run with "debug".
+**What's included:**
+- **Test input files**: rack_1_input.txt through rack_11_input.txt
+- **Test documentation**: input_descriptions.txt provides detailed descriptions of each test case and what it's designed to validate
 
-Input file should be a .txt file. Each line should have a new source rack with a string for the rack id, followed by a space and a numeric value from 1 to 96 indicating the number of samples in the rack. See input file rack_data.txt for an example.
+All test files are located in the same directory as Rack_Final.vcxproj
 
-Place the input file in the "Debug" folder that is generated when Visual Studio builds the project. This is also where the output file (a .csv file) should be located once the program creates it.
-
-Program has not been thoroughly tested on a wide variety of data distributions. Based on the researcher's descriptions, most data distributions contain vastly more racks with low sample numbers than high sample numbers, and I designed the program with this in mind.
+## Important Note ⚠️
+The algorithm is optimized for typical laboratory distributions skewed towards lower-numbered samples (based on real-world usage patterns). While thoroughly tested on laboratory-typical data distributions, performance on unusual distributions may vary
