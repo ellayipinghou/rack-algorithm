@@ -57,9 +57,10 @@ The program distributes all source racks using two main strategies:
 
 ### Remainder Distribution (distribute_remainder)
 For the final racks, the algorithm uses a simpler greedy approach:
-- Calculates how many racks can fit in the current batch based on sample totals
-- Ensures total sources + destinations doesn't exceed 20 racks per batch
-- Creates new batches as needed until all racks are distributed
+- Processes remaining source racks in their current order (how they were read in)
+- For each potential source rack, updates required destination racks based on cumulative sample count
+- Stops adding source racks when number of source racks + destination racks in the batch exceeds 20
+- Creates new batches as needed until all remaining racks are distributed
 
 ### Output and Results
 After distribution is complete, the program:
