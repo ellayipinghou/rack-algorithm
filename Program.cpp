@@ -83,7 +83,7 @@ void Program::distribute_racks() {
 
 /*
 * name: distribute_remainder
-* purpose: create the last batch with all remaining sources
+* purpose: creates the remainder of the batches when there are less than 19 sources using a greedy approach
 * arguments: none
 * returns: none
 * notes: only use when less than 19 sources are left to be distributed
@@ -103,6 +103,7 @@ void Program::distribute_remainder() {
             if (sum > (num_destinations * RACK_CAPACITY)) {
                 num_destinations++;
             }
+            //number of racks exceeds 20, so break and move onto next batch
             if (testing_array.size() + 1 + num_destinations > 20) {
                 break;
             }
@@ -387,8 +388,7 @@ int Program::find_next_smallest_valid(int current) {
 * purpose: exports the results of the algorithm
 * arguments: none
 * returns: none
-* notes: output will be a csv file containing the id, sample number, batch number, and number of samples in the batch for
-*        each batch created
+* notes: output will be a csv file containing the batch statistics
 */
 void Program::export_results() {
 
