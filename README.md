@@ -51,11 +51,11 @@ The algorithm begins by reading rack data and populating a sample_frequencies ar
 ### Main Distribution Loop 💫
 The program distributes all source racks using two main strategies:
 
-#### For Large Batches (≥19 source racks remaining):
-- Uses create_new_batch() to optimize each batch individually
+#### Optimization Phase (≥19 source racks remaining):
+- Uses create_new_batch() to find optimal combinations from abundant choices
 - Continues until fewer than 19 source racks remain
 
-#### For Remaining Racks (<19 source racks):
+#### Cleanup Phase (<19 source racks remaining):
 - Uses distribute_remainder() to efficiently pack remaining racks
 - Creates batches by adding as many racks as possible without exceeding destination capacity
 - Continues until all racks are distributed
@@ -108,4 +108,4 @@ The program includes 11 comprehensive test cases designed to validate the algori
 All test files are located in the same directory as Rack_Final.vcxproj
 
 ## Important Note ⚠️
-The algorithm is optimized for typical laboratory distributions skewed towards lower-numbered samples (based on real-world usage patterns). While thoroughly tested on laboratory-typical data distributions, performance on unusual distributions may vary
+The algorithm is optimized for typical laboratory distributions, which are generally skewed toward lower-numbered samples based on real-world usage patterns. Although the provided test files include some non-standard data distributions, performance may vary with these less typical cases.
