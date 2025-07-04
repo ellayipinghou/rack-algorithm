@@ -102,10 +102,13 @@ After distribution is complete, the program:
 The program includes 11 comprehensive test cases designed to validate the algorithm's performance across different data distributions and edge cases. These test files help ensure the algorithm works correctly under various real-world scenarios.
 
 **What's included:**
-- **Test input files**: rack_1_input.txt through rack_11_input.txt
+- **Test input files**: rack_input_1.txt through rack_input_11.txt
+- **Test result files**: result_1.csv through result_11.csv
 - **Test documentation**: input_descriptions.txt provides detailed descriptions of each test case and what it's designed to validate
 
-All test files are located in the same directory as Rack_Final.vcxproj
+Input files are located in the "inputs" folder, in the same directory as Rack_Final.vcxproj
 
-## Important Note ⚠️
-The algorithm is optimized for typical laboratory distributions, which are generally skewed toward lower-numbered samples based on real-world usage patterns. Although the provided test files include some non-standard data distributions, performance may vary with these less typical cases.
+## Important Notes ⚠️
+- The algorithm is optimized for typical laboratory distributions, which are generally skewed toward lower-numbered samples based on real-world usage patterns
+  - Although the provided test files include some non-standard data distributions, performance may vary with these less typical cases
+- The program contains little to no error-checking for invalid formats, so please ensure your inputs are formatted correctly
