@@ -22,14 +22,15 @@ using namespace std;
 */
 void Program::read_data() {
     string filename;
-    cout << "This is the Rack Distribution Program, please enter the name of a txt data file (must include .txt extension at end of name)" << endl;
+    cout << "This is the Rack Distribution Program, please enter the name of a txt data file (must include .txt extension at end of name)." << endl;
     cin >> filename;
 
     ifstream infile;
-    infile.open(filename);
-    if (infile.fail()) {
-        cout << "Error opening file. Check that file name is valid and that the file is located in the same folder as the project (RackFinal.vcxproj)" << endl;
-        exit(EXIT_FAILURE);
+    infile.open("inputs/" + filename);
+    while (infile.fail()) {
+        cout << "Error opening file. Check that file name is valid, contains '.txt' extension, and is located in the 'inputs' folder. Please re-enter file name: ";
+        cin >> filename;
+        infile.open("inputs/" + filename);
     }
     while (!infile.eof()) {
         Source_Rack current_source;
