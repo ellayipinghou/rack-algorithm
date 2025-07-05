@@ -33,7 +33,7 @@ In summer 2024, a hospital researcher approached me with a frustrating manual la
     - Create a .txt file with your rack data
     - Format: Each line should contain [Rack_ID] [Sample_Count]
     - Sample counts must be between 1 and 96
-4. **Place your input file** in the same folder as the Rack_Final.vcxproj file
+4. **Place your input file** in the "inputs" folder, located in the same directory as the Rack_Final.vcxproj file
 5. **Run the program** and follow the prompts
 6. **Find your results** in the generated CSV file in the "results" folder
 
