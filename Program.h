@@ -20,6 +20,9 @@ using namespace std;
 //number of spots in a rack, usually 96
 const int RACK_CAPACITY = 96;
 
+//number of total racks in a batch, usually 20
+const int BATCH_CAPACITY = 20;
+
 class Program {
 public:
 	//constructor

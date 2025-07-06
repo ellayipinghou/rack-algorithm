@@ -104,8 +104,8 @@ void Program::distribute_remainder() {
             if (sum > (num_destinations * RACK_CAPACITY)) {
                 num_destinations++;
             }
-            //number of racks exceeds 20, so break and move onto next batch
-            if (testing_array.size() + 1 + num_destinations > 20) {
+            //number of racks exceeds BATCH_CAPACITY, so break and move onto next batch
+            if (testing_array.size() + 1 + num_destinations > BATCH_CAPACITY) {
                 break;
             }
             testing_array.push_back(all_sources.at(i).num_samples);
@@ -128,7 +128,7 @@ int Program::choose_num_sources() {
 
     //start with the smallest number of sources
     int num_sources = 1;
-    int destination_spots = (20 - num_sources) * RACK_CAPACITY;
+    int destination_spots = (BATCH_CAPACITY - num_sources) * RACK_CAPACITY;
 
     //add the largest value
     int highest_valid = find_next_highest_valid(RACK_CAPACITY + 1);
@@ -139,7 +139,7 @@ int Program::choose_num_sources() {
     add_in_order(testing_array, highest_valid);
 
     //find the most sources we can add to the highest value without the sample total exceeding the number of destination spots
-    while (total_testing_samples() <= destination_spots && num_sources < 20) {
+    while (total_testing_samples() <= destination_spots && num_sources < BATCH_CAPACITY) {
         //add the remaining spots with the smallest value left
         int smallest = find_smallest();
         if (smallest == -1) {
@@ -148,7 +148,7 @@ int Program::choose_num_sources() {
         add_in_order(testing_array, smallest);
         //update number of sources and destination spots
         num_sources++;
-        destination_spots = (20 - num_sources) * RACK_CAPACITY;
+        destination_spots = (BATCH_CAPACITY - num_sources) * RACK_CAPACITY;
 
         if (total_testing_samples() < destination_spots) {
             backup_array = testing_array;
@@ -253,7 +253,7 @@ void Program::create_new_batch(int num_source_racks) {
             ideal_last_spot = next_highest;
         }
     } //if total is too low, increase total until you get to the next best last spot
-    else if ((ideal_last_spot > 96 || not is_valid(ideal_last_spot)) && not approximate) {
+    else if ((ideal_last_spot > RACK_CAPACITY || not is_valid(ideal_last_spot)) && not approximate) {
         increase_testing_total(ideal_last_spot, to_add, num_source_racks, approximate);
     }
     //add final value to testing array (note: if approximating, backup_array will already have num_sources sources, no last spot necessary)
@@ -610,7 +610,7 @@ bool Program::add_all_except_last(int num_source_racks) {
 * notes: none
 */
 int Program::ideal_last(int num_source_racks) {
-    int goal_sample_num = (20 - num_source_racks) * RACK_CAPACITY;
+    int goal_sample_num = (BATCH_CAPACITY - num_source_racks) * RACK_CAPACITY;
     return goal_sample_num - total_testing_samples();
 }
 
