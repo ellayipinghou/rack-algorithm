@@ -63,8 +63,8 @@ The program distributes all source racks using two main strategies:
 ### Batch Creation Process (create_new_batch) 📊
 #### 1. Determine Batch Size
 - choose_num_sources() finds the maximum number of source racks that can fit in one batch
-- Starts with the largest available sample number plus smallest values
-- Incrementally adds sources until destination capacity would be exceeded
+- Starts with the largest available sample number
+- Incrementally adds smallest sources until destination capacity would be exceeded
 - Saves a backup_array as the last valid configuration before exceeding capacity
 
 #### 2. Build Optimal Combination
