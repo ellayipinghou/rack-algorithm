@@ -2,7 +2,7 @@
 
 ## Overview 📜
 
-This program automates the tedious process of combining laboratory sample racks into optimal batches. Using a greedy algorithm, it takes hundreds of individual racks (each containing 1-96 samples) and efficiently combines them into near-capacity destination racks while minimizing the total number of processing batches.
+This program automates the tedious process of combining laboratory sample racks into optimal batches. Using a greedy algorithm, it takes hundreds of individual racks (each containing 1-96 samples) and efficiently combines them into near-capacity destination racks, maximizing the utilization space while keeping the total number of processing batches reasonable.
 
 ### Key Features ✨:
 - Intelligent batch optimization following laboratory constraints
