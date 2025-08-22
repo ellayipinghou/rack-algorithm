@@ -2,7 +2,7 @@
 
 ## Overview 📜
 
-This program automates the tedious process of combining laboratory sample racks into optimal batches. Using a greedy algorithm, it takes hundreds of individual racks (each containing 1-96 samples) and efficiently combines them into near-capacity destination racks, maximizing the utilization space while keeping the total number of processing batches reasonable.
+This program automates the tedious process of combining laboratory sample racks into optimal batches. Using a heuristic algorithm, it takes hundreds of individual racks (each containing 1-96 samples) and efficiently combines them into near-capacity destination racks, maximizing the utilization space while keeping the total number of processing batches reasonable.
 
 ### Key Features ✨:
 - Intelligent batch optimization following laboratory constraints
@@ -86,7 +86,7 @@ The program distributes all source racks using two main strategies:
 - Removes used racks from the available pool
 
 ### Remainder Distribution (distribute_remainder) 🔎
-For the final racks, the algorithm uses a simpler greedy approach:
+For the final racks, the algorithm uses a simpler heuristic approach:
 - Processes remaining source racks in their current order (how they were read in)
 - For each potential source rack, updates required destination racks based on cumulative sample count
 - Stops adding source racks when number of source racks + destination racks in the batch exceeds 20
