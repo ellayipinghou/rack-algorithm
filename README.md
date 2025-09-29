@@ -11,7 +11,7 @@ This program automates the tedious process of combining laboratory sample racks 
 - Built-in debugging functions for validation
 
 ## The Problem 💥
-In summer 2024, a hospital researcher approached me with a frustrating manual lab task that was eating up hours of their time. They regularly receive hundreds of sample racks containing anywhere from 1 to 96 samples each, and must manually figure out how to combine these into full or near-full racks while minimizing processing batches.
+In summer 2024, a biorepository researcher approached me with a frustrating manual lab task that was eating up hours of their time. They regularly receive hundreds of sample racks containing anywhere from 1 to 96 samples each, and must manually figure out how to combine these into full or near-full racks while minimizing processing batches.
 
 **The Challenge**: The process isn't as simple as just filling up racks - there are strict operational constraints:
 - Rack Types: Each batch consists of "source" racks (being emptied) and "destination" racks (being filled)
