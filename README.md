@@ -2,7 +2,7 @@
 
 ## Overview 📜
 
-This program automates the tedious process of combining laboratory sample racks into optimal batches. Using a greedy algorithm, it takes hundreds of individual racks (each containing 1-96 samples) and efficiently combines them into near-capacity destination racks while minimizing the total number of processing batches.
+This program automates the tedious process of combining laboratory sample racks into optimal batches. Using a heuristic bin-packing algorithm, it takes hundreds of individual racks (each containing 1-96 samples) and efficiently combines them into near-capacity destination racks, maximizing the utilization space while keeping the total number of processing batches reasonable.
 
 ### Key Features ✨:
 - Intelligent batch optimization following laboratory constraints
@@ -11,7 +11,7 @@ This program automates the tedious process of combining laboratory sample racks 
 - Built-in debugging functions for validation
 
 ## The Problem 💥
-In summer 2024, a hospital researcher approached me with a frustrating manual lab task that was eating up hours of their time. They regularly receive hundreds of sample racks containing anywhere from 1 to 96 samples each, and must manually figure out how to combine these into full or near-full racks while minimizing processing batches.
+In summer 2024, a biorepository researcher approached me with a frustrating manual lab task that was eating up hours of their time. They regularly receive hundreds of sample racks containing anywhere from 1 to 96 samples each, and must manually figure out how to combine these into full or near-full racks while minimizing processing batches.
 
 **The Challenge**: The process isn't as simple as just filling up racks - there are strict operational constraints:
 - Rack Types: Each batch consists of "source" racks (being emptied) and "destination" racks (being filled)
@@ -86,7 +86,7 @@ The program distributes all source racks using two main strategies:
 - Removes used racks from the available pool
 
 ### Remainder Distribution (distribute_remainder) 🔎
-For the final racks, the algorithm uses a simpler greedy approach:
+For the final racks, the algorithm uses a simpler heuristic approach:
 - Processes remaining source racks in their current order (how they were read in)
 - For each potential source rack, updates required destination racks based on cumulative sample count
 - Stops adding source racks when number of source racks + destination racks in the batch exceeds 20
