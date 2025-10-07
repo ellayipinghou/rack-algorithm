@@ -5,7 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <array>
-#include "..\Program.h"
+#include "Program.h"
 
 using namespace std;
 

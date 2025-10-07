@@ -22,7 +22,7 @@ using namespace std;
 */
 void Program::read_data() {
     string filename;
-    cout << "This is the Rack Distribution Program, please enter the name of a txt data file (must include .txt extension at end of name)." << endl;
+    cout << "This is the Rack Distribution Program, please enter the name of a txt data file (must include .txt extension at end of name):" << endl;
     cin >> filename;
 
     ifstream infile;
