@@ -1,4 +1,4 @@
-Rack ID,Sample Number,Batch Number,Number Sources,Number Destinations,Total Samples In Batch
+Rack ID,Sample Count,Batch ID Number,Number of Sources,Number of Destinations,Total Sample Count In Batch
 RACK3I0000021,40,1,13,7,609
 RACK3I0000037,40,1,13,7,609
 RACK3I0000041,40,1,13,7,609

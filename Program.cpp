@@ -410,7 +410,7 @@ void Program::export_results() {
     }
 
     //create output string and add information
-    string output = "Rack ID,Sample Number,Batch Number,Number Sources,Number Destinations,Total Samples In Batch\n";
+    string output = "Rack ID,Sample Count,Batch ID Number,Number of Sources,Number of Destinations,Total Sample Count In Batch\n";
 
     for (int i = 0; i < finished_batches.size(); i++) {
         //calculate batch-level statistics
