@@ -96,7 +96,7 @@ For the final racks, the algorithm uses a simpler heuristic approach:
 ### Output and Results 📈
 After distribution is complete, the program:
 - Provides an optional summary showing batch counts, source/destination ratios, and capacity utilization
-- Exports detailed results to a CSV file with columns: Rack ID, Sample Number, Batch Number, Number Sources, Number Destinations, and Total Samples In Batch (with one row per source rack)
+- Exports detailed results to a CSV file with columns: Rack ID, Sample Count, Batch ID Number, Number of Sources, Number of Destinations, and Total Sample Count In Batch (with one row per source rack)
     - The generated CSV file can be found in the "results" folder located in the same folder as Rack_Final.vcxproj
 
 ## Test Files 📂
